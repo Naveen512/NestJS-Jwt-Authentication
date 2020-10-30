@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import {JwtService} from '@nestjs/jwt'
+var randtoken = require('rand-token');
 
 @Injectable()
 export class AuthService {
@@ -23,9 +24,19 @@ export class AuthService {
     }
 
     async login(user:any){
-        const payload = {username: user.userName, sub: user.id};
+        const payload = {username: user.userName, sub: user.userId};
         return{
-            accessToken : this.jwtService.sign(payload)
+            accessToken : this.jwtService.sign(payload),
+            refreshToken: await this.generateRefreshToken(user.userId)
         }
     }
+
+    async generateRefreshToken(userId):  Promise<string>{
+        var refreshToken = randtoken.generate(16);
+        var expirydate =new Date();
+        expirydate.setDate(expirydate.getDate() + 6);
+        await this.usersService.saveorupdateRefreshToke(refreshToken, userId, expirydate);
+        return refreshToken
+    }
+    
 }

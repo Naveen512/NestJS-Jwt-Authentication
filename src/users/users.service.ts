@@ -11,4 +11,10 @@ export class UsersService {
   async findOne(userName: string): Promise<User | undefined> {
     return  this.userRepo.findOne({userName});
   }
+  async saveorupdateRefreshToke(
+     refreshToken:string,
+     id:string, 
+     refreshtokenexpires){
+    await this.userRepo.update(id,{refreshtoken:refreshToken, refreshtokenexpires});
+  }
 }

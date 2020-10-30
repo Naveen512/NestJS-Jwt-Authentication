@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import {AuthService} from './auth/auth.service';
 import { ok } from 'assert';
 import { get } from 'http';
+import { userInfo } from 'os';
 
 @Controller()
 export class AppController {
@@ -18,7 +19,7 @@ export class AppController {
   @UseGuards(AuthGuard('local'))
   @Post('auth/login')
   async login(@Request() req){
-    return this.authService.login(req.user);
+    return this.authService.login({userId: req.user.id, userName: req.user.username});
   }
   // @Post('auth/login')
   // async login(){
@@ -29,5 +30,11 @@ export class AppController {
   @Get('todos')
   getTodos(){
     return ['Watch Movie', 'Take Health Test', 'Play Cricket'];
+  }
+
+  @UseGuards(AuthGuard('jwt-refreshtoken'))
+  @Post('auth/refreshtoken')
+  async refreshToken(@Request() req){
+    return await this.authService.login(req.user);
   }
 }
